@@ -1,3 +1,5 @@
+const { z } = require("zod")
+
 const userRegisterSchema = z.object({
   name: z.string({
     required_error: 'Name is required',
@@ -5,7 +7,7 @@ const userRegisterSchema = z.object({
   })
     .min(3, { message: 'Must be 3 or more characters long' })
     .max(40, { message: 'Must be 30 or fewer characters long' }),
-  lastName: z.string({
+  lastname: z.string({
     required_error: 'Last name is required',
     invalid_type_error: 'Last name must be a string',
   })
@@ -25,8 +27,26 @@ const userRegisterSchema = z.object({
     .max(40, { message: 'Must be 40 or fewer characters long' }),
 })
 
+const userLoginSchema = z.object({
+  email: z.string({
+    required_error: 'Email is required',
+    invalid_type_error: 'Email must be a string',
+  })
+    .email({ message: 'Invalid email address' })
+    .min(5, { message: 'Must be 5 or more characters long' })
+    .max(40, { message: 'Must be 5 or fewer characters long' }),
+  password: z.string({
+    required_error: 'Password is required',
+    invalid_type_error: 'Password must be a string',
+  })
+})
+
+
 function validateRegister (object) {
   return userRegisterSchema.safeParse(object)
 }
+function validateLogin (object) {
+  return userLoginSchema.safeParse(object)
+}
 
-module.exports = {validateRegister}
+module.exports = {validateRegister, validateLogin}

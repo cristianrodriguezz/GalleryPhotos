@@ -1,12 +1,15 @@
 const express = require('express')
 const fileUpload = require('express-fileupload')
 const photosRoutes = require('./routes/photos')
+const authRoutes = require('./routes/auth')
 const cors = require('cors')
 const corsMiddleware = require('./middleware/corsMiddleware')
+const authMiddleware = require('./middleware/authMiddleware')
 
 const app = express()
 
 app.use(corsMiddleware())
+app.use(authMiddleware)
 
 const port = 3000
 
@@ -16,6 +19,7 @@ app.use(fileUpload({
 }));
 
 app.use(photosRoutes)
+app.use(authRoutes)
 
 app.listen(port)
 
