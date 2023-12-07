@@ -1,6 +1,6 @@
 const { Router } = require('express')
-const { uploadFile, getPhotosByUser, getRandomPhotos, getPhotosByUserName, likePhoto, getLikesPhotoByUserId, dislikePhoto } = require('../controllers/photo')
-const { validateGetPhotos, validateGetRandomPhotos, validateGetPhotosByUsername, validateLikePhoto } = require('../validators/photos')
+const { uploadFile, getPhotosByUser, getRandomPhotos, getPhotosByUserName, likePhoto, getLikesPhotoByUserId, dislikePhoto, getCountLikePhotoById, getPhotosLikeByUser } = require('../controllers/photo')
+const { validateGetPhotos, validateGetRandomPhotos, validateGetPhotosByUsername, validateLikePhoto, validateCountPhoto } = require('../validators/photos')
 const { validateUploadPhoto } = require('../validators/uploadPhotos')
 
 const router = Router()
@@ -18,6 +18,10 @@ router.post('/like', likePhoto)
 router.post('/dislike', dislikePhoto)
 
 router.get('/likes', validateGetPhotos, getLikesPhotoByUserId)
+
+router.get('/count', validateCountPhoto, getCountLikePhotoById)
+
+router.get('/getPhotosLikeByUser', validateGetPhotosByUsername, getPhotosLikeByUser)
 
 
 

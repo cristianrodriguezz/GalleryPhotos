@@ -13,6 +13,10 @@ const validateGetRandomPhotos = [
   query('limit').isInt().withMessage('limit must be a valid integer.')
 ]
 
+const validateCountPhoto = [
+  query('photoId').isInt().withMessage('photoId must be a valid integer.'),
+]
+
 
 const likePhoto = z.object({
   userId: z.number({
@@ -32,4 +36,4 @@ function validateLikePhoto (object) {
 
 
 
-module.exports = { validateGetPhotos , validateGetRandomPhotos, validateGetPhotosByUsername, validateLikePhoto}
+module.exports = { validateGetPhotos , validateGetRandomPhotos, validateGetPhotosByUsername, validateLikePhoto, validateCountPhoto}

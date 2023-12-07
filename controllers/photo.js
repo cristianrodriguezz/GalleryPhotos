@@ -274,7 +274,7 @@ const dislikePhoto = async (req , res) => {
     
     await client.query(queryDislikePhoto)
 
-    res.send( 'Successfully deleted' )
+    res.send({ ok:'Successfully deleted'} )
 
     await client.query('COMMIT')
 
@@ -329,9 +329,81 @@ const getLikesPhotoByUserId = async (req , res) => {
 
 }
 
+const getCountLikePhotoById = async (req, res) => {
+  const errors = validationResult(req)
+
+  if(!errors.isEmpty()) return res.send({error: errors.array()})
+  
+  const { photoId } = req.query
+
+  const client = await pool.connect()
+  
+  const query = {
+    text: `SELECT id, user_id, photo_id
+    FROM public."LikesPhotos"
+    where photo_id = $1 `,
+    values: [photoId]
+  }
+
+  try {
+
+    const response = await client.query(query)
+
+    res.send( response.rows )
+
+
+  } catch (error) {
+
+    res.status(400).send({Error: error.message})
+    
+    
+  } finally{
+
+    client.release()
+
+  }
+}
+const getPhotosLikeByUser = async (req, res) => {
+  
+  const errors = validationResult(req)
+
+  if(!errors.isEmpty()) return res.send({error: errors.array()})
+  
+  const { username } = req.query
+
+  const client = await pool.connect()
+  
+  const query = {
+    text: `SELECT *
+    FROM public."LikesPhotos" lp
+    JOIN public."Users" u ON u.id = lp.user_id
+    JOIN public."Photos" ph ON lp.photo_id = ph.id
+    where u.username = $1`,
+    values: [username]
+  }
+
+  try {
+
+    const response = await client.query(query)
+
+    res.send( response.rows )
+
+
+  } catch (error) {
+
+    res.status(400).send({Error: error.message})
+    
+    
+  } finally{
+
+    client.release()
+
+  }
+}
 
 
 
 
-module.exports = { uploadFile, getPhotosByUser, getRandomPhotos, getPhotosByUserName, likePhoto, dislikePhoto, getLikesPhotoByUserId}
+
+module.exports = { uploadFile, getPhotosByUser, getRandomPhotos, getPhotosByUserName, likePhoto, dislikePhoto, getLikesPhotoByUserId, getCountLikePhotoById, getPhotosLikeByUser}
 
