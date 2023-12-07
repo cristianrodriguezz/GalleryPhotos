@@ -1,12 +1,21 @@
 const { Router } = require('express')
-const { uploadFile, getPhotos } = require('../controllers/s3')
-const { validateGetPhotos } = require('../validators/getphotos')
+const { uploadFile, getPhotosByUser, getRandomPhotos, getPhotosByUserName, likePhoto, getLikesPhotoByUserId } = require('../controllers/photo')
+const { validateGetPhotos, validateGetRandomPhotos, validateGetPhotosByUsername, validateLikePhoto } = require('../validators/photos')
+const { validateUploadPhoto } = require('../validators/uploadPhotos')
 
 const router = Router()
 
-router.post('/upload', uploadFile)
+router.post('/upload', validateUploadPhoto, uploadFile)
 
-router.get('/getphotos', validateGetPhotos , getPhotos)
+router.get('/getphotos', validateGetPhotos , getPhotosByUser)
+
+router.get('/getRandomPhotos',validateGetRandomPhotos, getRandomPhotos)
+
+router.get('/getPhotosByUserName',validateGetPhotosByUsername, getPhotosByUserName)
+
+router.post('/like', likePhoto)
+
+router.get('/likes', validateGetPhotos, getLikesPhotoByUserId)
 
 
 

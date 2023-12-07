@@ -8,6 +8,7 @@ const authMiddleware = require('./middleware/authMiddleware')
 
 const app = express()
 
+app.use(express.json());
 app.use(corsMiddleware())
 app.use(authMiddleware)
 
@@ -18,8 +19,7 @@ app.use(fileUpload({
   tempFileDir : './uploads'
 }));
 
-app.use(photosRoutes)
-app.use(authRoutes)
+app.use('/api', require('./routes'))
 
 app.listen(port)
 

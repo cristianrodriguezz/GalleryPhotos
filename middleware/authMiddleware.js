@@ -1,13 +1,16 @@
-const pool = require('../config/db')
+const pool = require('../config/db');
+const allowedRoutes = require('./allowedRoutes');
 const { handleHttpError } = require('../utils/handleError')
 const { verifyToken } = require('../utils/handleJwt')
 
 const authMiddleware = async (req, res, next) => {
-  const client = await pool.connect()
-  const path = req.originalUrl
-  console.log(path)
-  if(path === '/auth/login' || path === '/auth/register') return next()
 
+  const path = req.originalUrl
+  console.log(path);
+
+  if (allowedRoutes.includes(path.split('?')[0])) return next();
+  
+  const client = await pool.connect()
   try {
 
     if (!req.headers.authorization) {

@@ -12,6 +12,11 @@ const userRegisterSchema = z.object({
     invalid_type_error: 'Last name must be a string',
   })
     .max(40, { message: 'Must be 40 or fewer characters long' }),
+  username: z.string({
+      required_error: 'Last name is required',
+      invalid_type_error: 'Last name must be a string',
+    })
+      .max(50, { message: 'Must be 40 or fewer characters long' }),
   email: z.string({
     required_error: 'Email is required',
     invalid_type_error: 'Email must be a string',

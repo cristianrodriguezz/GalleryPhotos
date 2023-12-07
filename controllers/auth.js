@@ -8,12 +8,9 @@ const { validateRegister , validateLogin} = require("../validators/user")
 const register = async (req, res) => {
   const result = validateRegister(req.body)
 
-  console.log(req.query);
-  console.log(req.body);
-
   if(result.error) return res.status(400).send({ error: result.error.issues })
 
-  const { name, lastname, email, password } = result.data
+  const { name, lastname, email, password , username} = result.data
 
   const encryptPw = await encrypt(password)
 
@@ -24,9 +21,9 @@ const register = async (req, res) => {
 
     const queryRegister = {
       text: `INSERT INTO public."Users"(
-        name, lastname, email, password)
-       VALUES ( $1, $2, $3, $4) returning name, lastname, email`,
-      values: [name,lastname,email,encryptPw]
+        name, lastname, email, password, username)
+       VALUES ( $1, $2, $3, $4, $5) returning name, lastname, email`,
+      values: [name,lastname,email,encryptPw, username]
     }
 
     const response = await client.query(queryRegister)
@@ -87,6 +84,7 @@ const login = async (req, res) => {
       lastname: user.lastname,
       name: user.name,
       id: user.id,
+      username: user.username
     }
 
     const data = {
