@@ -62,7 +62,7 @@ async function uploadFile (req, res) {
   } finally {
 
     client.release()
-    
+
   }
 }
 
@@ -186,6 +186,7 @@ const getPhotosByUserName = async (req , res) => {
   }
 
 }
+
 const likePhoto = async (req , res) => {
 
   const result = validateLikePhoto(req.body)
@@ -218,11 +219,62 @@ const likePhoto = async (req , res) => {
 
     const responseValidateLikePhoto = await client.query(queryValidateLike)
 
-    if(responseValidateLikePhoto.rowCount !== 0 ) throw new Error('You have already liked the photo.')
+    if(responseValidateLikePhoto.rowCount !== 0 ) return res.status(409).send({Error:'You have already liked the photo.' })
     
     const responseLikePhoto = await client.query(queryLikePhoto)
 
     res.send( responseLikePhoto.rows )
+
+    await client.query('COMMIT')
+
+  } catch (error) {
+
+    res.status(400).send({Error: error.message})
+    
+    await client.query('ROLLBACK')
+    
+  } finally {
+
+    client.release()
+
+  }
+
+}
+
+const dislikePhoto = async (req , res) => {
+
+  const result = validateLikePhoto(req.body)
+
+  if(result.error) return res.status(400).send({ error: result.error.issues })
+
+  const { userId , photoId } = result.data
+
+  const client = await pool.connect()
+  
+  const queryValidateLike = {
+    text: `SELECT id, user_id, photo_id
+    FROM public."LikesPhotos"
+    where user_id = $1 and photo_id = $2`,
+    values: [userId, photoId]
+  }
+
+  const queryDislikePhoto = {
+    text: `DELETE FROM public."LikesPhotos"
+    WHERE user_id = $1 and photo_id = $2;`,
+    values: [userId, photoId]
+  }
+
+  try {
+
+    await client.query('BEGIN')
+
+    const responseValidateLikePhoto = await client.query(queryValidateLike)
+
+    if(responseValidateLikePhoto.rowCount === 0 ) return res.status(409).send({Error:'You have not liked the photo yet.'})
+    
+    await client.query(queryDislikePhoto)
+
+    res.send( 'Successfully deleted' )
 
     await client.query('COMMIT')
 
@@ -276,39 +328,7 @@ const getLikesPhotoByUserId = async (req , res) => {
   }
 
 }
-const dislikePhoto = async (req , res) => {
 
-  const errors = validationResult(req)
-
-  if(!errors.isEmpty()) return res.send({error: errors.array()})
-  
-  const { id } = req.query
-
-  const client = await pool.connect()
-
-  const queryDisLikePhoto = {
-    text: `UPDATE public."Photos"
-    SET likes = likes - 1
-    WHERE id = $1
-    returning *`,
-    values: [id]
-  }
-
-  try {
-    const response = await client.query(queryDisLikePhoto)
-
-    res.send( response.rows )
-    
-  } catch (error) {
-    res.status(400).send(error)
-
-  } finally {
-
-    client.release()
-
-  }
-
-}
 
 
 

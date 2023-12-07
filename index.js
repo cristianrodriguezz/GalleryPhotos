@@ -10,7 +10,7 @@ const app = express()
 
 app.use(express.json());
 app.use(corsMiddleware())
-app.use(authMiddleware)
+// app.use(authMiddleware)
 
 const port = 3000
 
