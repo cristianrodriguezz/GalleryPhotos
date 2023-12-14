@@ -28,17 +28,25 @@ const register = async (req, res) => {
 
     const response = await client.query(queryRegister)
 
+    
     console.log(response.rows[0])
     
     await client.query('COMMIT')
-
+    
     res.send({data: response.rows[0]})
-
+    
   } catch (error) {
-
+    
     await client.query('ROLLBACK')
 
-    res.status(409).json({ error: 'Email already exists' })
+    const errors = error.detail.split('(').join(')').split(')')
+
+    if(errors.some(error => error === 'email')){
+      res.status(409).json({ error: 'Email en uso, elije otro' })
+    }
+    if(errors.some(error => error === 'username')){
+      res.status(409).json({ error: 'Username en uso, elije otro.' })
+    }
 
     
   }finally{
